@@ -69,6 +69,39 @@ app.get("/works/:id", (req, res) => {
   } else res.status(404).send({ error: "Work not found" });
 });
 
+const updateMuseum=db.prepare(`
+UPDATE museums
+SET name=@name,city=@city
+WHERE id=@id
+`)
+
+app.patch("/museums/:id",(req,res)=>{
+    const findMuseum=getAMuseum.get(req.params)
+    if(findMuseum){
+    const updatedMuseum={...findMuseum,...req.body}
+    updateMuseum.run(updatedMuseum)
+    res.send(updatedMuseum)
+    }
+    else res.status(404).send({error:"Museum not found"})
+})
+
+const updateWork=db.prepare(`
+UPDATE works
+SET name=@name, picture=@picture, museumId=@museumId
+WHERE id=@id
+`)
+
+app.patch("/works/:id",(req,res)=>{
+  const findWork=getAWork.get(req.params)
+  if(findWork){
+    const updatedWork={...findWork,...req.body}
+    updateWork.run(updatedWork)
+    res.send(updatedWork)
+  }
+  else res.status(404).send({error:"Work not found"})
+
+})
+
 app.listen(port, () => {
   console.log(`SErver is running in: http://localhost:${port}/museums`);
 });
