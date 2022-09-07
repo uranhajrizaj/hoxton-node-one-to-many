@@ -102,6 +102,27 @@ app.patch("/works/:id",(req,res)=>{
 
 })
 
+const deleteWork=db.prepare(`
+DELETE FROM works WHERE id=@id
+`)
+
+app.delete("/works/:id",(req,res)=>{
+    const info=deleteWork.run(req.params)
+    if(info.changes) res.send({message:"Work deleted succesfully"})
+    else res.status(404).send({error:"Work not found"})
+
+})
+
+const deleteMuseum=db.prepare(`
+DELETE FROM museums WHERE id=@id
+`)
+
+app.delete("/museums/:id",(req,res)=>{
+    const info=deleteMuseum.run(req.params)
+    if(info.changes) res.send({message:"Museum deleted succesfully"})
+    else res.status(404).send({error:"Museum not found"})
+
+})
 app.listen(port, () => {
   console.log(`SErver is running in: http://localhost:${port}/museums`);
 });
