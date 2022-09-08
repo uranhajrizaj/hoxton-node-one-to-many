@@ -134,43 +134,49 @@ INSERT INTO museums(name,city) VALUES (@name,@city)
 `);
 
 app.post("/museums", (req, res) => {
-  let errors:String[]=[]
-  if(typeof req.body.name!=='string') errors.push(`Name not provided or not a string`)
-  if(typeof req.body.city!=='string') errors.push(`City not provided or not a string`)
-  
-  if(errors.length===0){
-    const info=postMuseum.run(req.body)
-    const newMuseum=getAMuseum.get({id:info.lastInsertRowid})
-    const getWorks=getALLWorksofMuseum.all({museumId:info.lastInsertRowid})
-     newMuseum.works=getWorks
-    res.send(newMuseum)
-  }
-  else res.status(400).send(errors)
+  let errors: String[] = [];
+  if (typeof req.body.name !== "string")
+    errors.push(`Name not provided or not a string`);
+  if (typeof req.body.city !== "string")
+    errors.push(`City not provided or not a string`);
+
+  if (errors.length === 0) {
+    const info = postMuseum.run(req.body);
+    const newMuseum = getAMuseum.get({ id: info.lastInsertRowid });
+    const getWorks = getALLWorksofMuseum.all({
+      museumId: info.lastInsertRowid,
+    });
+    newMuseum.works = getWorks;
+    res.send(newMuseum);
+  } else res.status(400).send(errors);
 });
 
-const postWork=db.prepare(`
+const postWork = db.prepare(`
 INSERT INTO works (name,picture,museumId) VALUES (@name,@picture,@museumId)
-`)
+`);
 
-app.post("/works",(req,res)=>{
-  let errors:String[]=[]
-  if(typeof req.body.name!=='string') errors.push(`Name not provided or not a string`)
-  if(typeof req.body.picture!=='string') errors.push(`Picture not provided or not a string`)
-  if(typeof req.body.museumId!=='number') errors.push(`Museum ID not provided or not a number`)
+app.post("/works", (req, res) => {
+  let errors: String[] = [];
+  if (typeof req.body.name !== "string")
+    errors.push(`Name not provided or not a string`);
+  if (typeof req.body.picture !== "string")
+    errors.push(`Picture not provided or not a string`);
+  if (typeof req.body.museumId !== "number")
+    errors.push(`Museum ID not provided or not a number`);
 
-   if(errors.length===0){
-    const museum=getMuseumOfWork.get({id:req.body.museumId})
-    if(museum){
-      const info=postWork.run(req.body)
-      const newWork=getAWork.get({id:info.lastInsertRowid})
-      museum.works=[newWork]
-      res.send(museum)
-    }
-    else res.status(400).send({error:"You are trying to add a work to the museum that not exists!"})  
-   }
-   else res.status(400).send({errors})
- 
-})
+  if (errors.length === 0) {
+    const museum = getMuseumOfWork.get({ id: req.body.museumId });
+    if (museum) {
+      const info = postWork.run(req.body);
+      const newWork = getAWork.get({ id: info.lastInsertRowid });
+      museum.works = [newWork];
+      res.send(museum);
+    } else
+      res.status(400).send({
+        error: "You are trying to add a work to the museum that not exists!",
+      });
+  } else res.status(400).send({ errors });
+});
 app.listen(port, () => {
   console.log(`SErver is running in: http://localhost:${port}/museums`);
 });
