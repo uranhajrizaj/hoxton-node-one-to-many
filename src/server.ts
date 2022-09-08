@@ -163,8 +163,8 @@ app.post("/works",(req,res)=>{
     if(museum){
       const info=postWork.run(req.body)
       const newWork=getAWork.get({id:info.lastInsertRowid})
-      newWork.museum=museum
-      res.send(newWork)
+      museum.works=[newWork]
+      res.send(museum)
     }
     else res.status(400).send({error:"You are trying to add a work to the museum that not exists!"})  
    }
